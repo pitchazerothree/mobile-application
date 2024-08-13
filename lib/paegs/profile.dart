@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_2/config/config.dart';
 import 'package:flutter_application_2/models/response/customer_idx_get_res.dart';
 import 'package:http/http.dart' as http;
@@ -32,44 +30,44 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // log('Customer id: ${widget.idx}');
+    log('Customer id: ${widget.idx}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('ข้อมูลส่วนตัว'),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
-          // log(value);
-  if (value == 'delete') {
-	showDialog(
-	  context: context,
-	  builder: (context) => SimpleDialog(
-		children: [
-		  const Padding(
-			padding: EdgeInsets.all(16.0),
-			child: Text(
-			  'ยืนยันการยกเลิกสมาชิก?',
-			  style: TextStyle(
-				  fontSize: 14, fontWeight: FontWeight.bold),
-			),
-		  ),
-		  Row(
-			mainAxisAlignment: MainAxisAlignment.spaceAround,
-			children: [
-			  TextButton(
-				  onPressed: () {
-					Navigator.pop(context);
-				  },
-				  child: const Text('ปิด')),
-			  FilledButton(
-onPressed: delete, child: const Text('ยืนยัน'))
-			],
-		  ),
-		],
-	  ),
-	);
-  }
-},
+              log(value);
+              if (value == 'delete') {
+                showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'ยืนยันการยกเลิกสมาชิก?',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('ปิด')),
+                          FilledButton(
+                              onPressed: delete, child: const Text('ยืนยัน'))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
             itemBuilder: (context) => [
               const PopupMenuItem<String>(
                 value: 'delete',
@@ -163,13 +161,15 @@ onPressed: delete, child: const Text('ยืนยัน'))
           }),
     );
   }
-void delete() async {
-	var config = await Configuration.getConfig();
-	var url = config['apiEndpoint'];
-	
-	var res = await http.delete(Uri.parse('$url/customers/${widget.idx}'));
-	// log(res.statusCode.toString());
-if (res.statusCode == 200) {
+
+  void delete() async {
+    var config = await Configuration.getConfig();
+    var url = config['apiEndpoint'];
+
+    var res = await http.delete(Uri.parse('$url/customers/${widget.idx}'));
+    log(res.statusCode.toString());
+
+    if (res.statusCode == 200) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -209,9 +209,7 @@ if (res.statusCode == 200) {
         ),
       );
     }
-
-
-}
+  }
 
   void update() async {
     var config = await Configuration.getConfig();
@@ -228,7 +226,7 @@ if (res.statusCode == 200) {
       var res = await http.put(Uri.parse('$url/customers/${widget.idx}'),
           headers: {"Content-Type": "application/json; charset=utf-8"},
           body: jsonEncode(json));
-      // log(res.body);
+      log(res.body);
       var result = jsonDecode(res.body);
       // Need to know json's property by reading from API Tester
       log(result['message']);
@@ -262,15 +260,15 @@ if (res.statusCode == 200) {
         ),
       );
     }
-}  
+  }
 
   Future<void> loadDataAsync() async {
     var config = await Configuration.getConfig();
     var url = config['apiEndpoint'];
     var res = await http.get(Uri.parse('$url/customers/${widget.idx}'));
-    // log(res.body);
+    log(res.body);
     customerIdxGetResponse = customerIdxGetResponseFromJson(res.body);
-    // log(jsonEncode(customerIdxGetResponse));
+    log(jsonEncode(customerIdxGetResponse));
     nameCtl.text = customerIdxGetResponse.fullname;
     phoneCtl.text = customerIdxGetResponse.phone;
     emailCtl.text = customerIdxGetResponse.email;
